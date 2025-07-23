@@ -4,5 +4,3 @@ oauth2client
 pandas
 fpdf
 qrcode
-smtplib
-email
