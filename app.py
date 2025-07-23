@@ -11,6 +11,7 @@ from email.message import EmailMessage
 import qrcode
 import os
 import json
+import random
 
 # ---- Password Protection ----
 def login():
@@ -72,11 +73,13 @@ with st.form("booking_form"):
         dest_code = destination_codes[destination]
         prefix = datetime.today().strftime("%y")
 
-        matching_ids = [row['Booking_ID'] for row in data if row['Destination'] == destination]
-        valid_ids = [bid for bid in matching_ids if isinstance(bid, str) and len(bid) >= 4 and bid[-4:].isdigit()]
-        last_serial = max([int(bid[-4:]) for bid in valid_ids], default=0)
-        next_serial = f"{last_serial + 1:04d}"
-        booking_id = f"{prefix}{dest_code}{next_serial}"
+        # Secure Unique Booking ID Generator
+        all_booking_ids = [row['Booking_ID'] for row in data if 'Booking_ID' in row]
+        while True:
+            rand_suffix = f"{random.randint(1, 9999):04d}"
+            booking_id = f"{prefix}{dest_code}{rand_suffix}"
+            if booking_id not in all_booking_ids:
+                break
 
         new_row = [
             booking_id, name, phone, email, address, destination,
