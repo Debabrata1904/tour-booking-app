@@ -45,7 +45,7 @@ sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1bSh0QHlZWo30
 
 # ---- Email Config ----
 EMAIL_SENDER = "indianexpress.tourdesk@gmail.com"
-EMAIL_PASSWORD = st.secrets["EMAIL_PASSWORD"]  # Also store this in secrets!
+EMAIL_PASSWORD = st.secrets["EMAIL_PASSWORD"]
 
 # ---- Booking Form ----
 st.title("🌐 Indian Express Tour Booking")
@@ -71,8 +71,10 @@ with st.form("booking_form"):
         data = sheet.get_all_records()
         dest_code = destination_codes[destination]
         prefix = datetime.today().strftime("%y")
+
         matching_ids = [row['Booking_ID'] for row in data if row['Destination'] == destination]
-        last_serial = max([int(bid[-4:]) for bid in matching_ids], default=0)
+        valid_ids = [bid for bid in matching_ids if isinstance(bid, str) and len(bid) >= 4 and bid[-4:].isdigit()]
+        last_serial = max([int(bid[-4:]) for bid in valid_ids], default=0)
         next_serial = f"{last_serial + 1:04d}"
         booking_id = f"{prefix}{dest_code}{next_serial}"
 
