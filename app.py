@@ -10,6 +10,7 @@ import smtplib
 from email.message import EmailMessage
 import qrcode
 import os
+import json
 
 # ---- Password Protection ----
 def login():
@@ -35,15 +36,16 @@ destination_codes = {
     "Purulia": "05"
 }
 
-# ---- Google Sheets Setup ----
+# ---- Google Sheets Setup via Secrets ----
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+creds_dict = json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"])
+creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 sheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1bSh0QHlZWo30Nxm9TSToZ4-RSe8ug2S121EJz6jI69U/edit#gid=0").sheet1
 
 # ---- Email Config ----
 EMAIL_SENDER = "indianexpress.tourdesk@gmail.com"
-EMAIL_PASSWORD = "jzic deug mrbs xngx"
+EMAIL_PASSWORD = st.secrets["EMAIL_PASSWORD"]  # Also store this in secrets!
 
 # ---- Booking Form ----
 st.title("🌐 Indian Express Tour Booking")
@@ -202,7 +204,3 @@ if st.button("❌ Delete Booking"):
         st.success(f"🗑️ Booking ID {delete_id} deleted.")
     else:
         st.error("❌ Booking ID not found.")
-
-# Edit (Coming Soon)
-st.markdown("### ✏️ Edit Booking")
-st.info("Coming soon...")
